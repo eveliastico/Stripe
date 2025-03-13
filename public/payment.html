@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Pago</title>
+</head>
+<body>
+    <h2>Formulario de Pago</h2>
+    <form id="paymentForm">
+        <label for="cardNumber">Número de Tarjeta:</label>
+        <input type="text" id="cardNumber" required><br>
+
+        <label for="cardExpiry">Fecha de Expiración:</label>
+        <input type="text" id="cardExpiry" required><br>
+
+        <label for="cardCVC">CVC:</label>
+        <input type="text" id="cardCVC" required><br>
+
+        <button type="submit">Pagar</button>
+    </form>
+
+    <script>
+        // Obtiene el ID del pago desde los parámetros de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentId = urlParams.get('paymentId');
+
+        // Verifica si el paymentId es null
+        if (!paymentId) {
+            console.error("paymentId no encontrado en la URL");
+        }
+
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Obtiene los datos del formulario
+            const cardNumber = document.getElementById('cardNumber').value;
+            const cardExpiry = document.getElementById('cardExpiry').value;
+            const cardCVC = document.getElementById('cardCVC').value;
+
+            // Realiza una solicitud HTTP POST a la API para procesar el pago
+            const response = await fetch(`http://localhost:3000/api/payments/${paymentId}/proccess`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    cardNumber,
+                    cardExpiry,
+                    cardCVC
+                })
+            });
+
+            // Convierte la respuesta en un objeto JSON
+            const data = await response.json();
+
+            // Muestra un mensaje de alerta con la respuesta de la API
+            alert(data.message);
+        });
+    </script>
+</body>
+</html>
